@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"golang.org/x/net/proxy"
 	"io"
 	"io/ioutil"
 	"net"
@@ -13,6 +12,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"golang.org/x/net/proxy"
 )
 
 // HTTPing ...
@@ -61,7 +62,8 @@ func (ping *HTTPing) Start() <-chan struct{} {
 				} else {
 					defer resp.Body.Close()
 					length, _ := io.Copy(ioutil.Discard, resp.Body)
-					fmt.Printf("Ping %s(%s) - %s is open - time=%s method=%s status=%d bytes=%d\n", ping.target, remoteAddr, ping.target.Protocol, duration, ping.Method, resp.StatusCode, length)
+					fmt.Printf("Ping %s(%s) - %s is open - time=%s method=%s status=%d bytes=%d\n",
+						ping.target, remoteAddr, ping.target.Protocol, duration, ping.Method, resp.StatusCode, length)
 					if ping.result.MinDuration == 0 {
 						ping.result.MinDuration = duration
 					}
@@ -117,6 +119,9 @@ func (ping HTTPing) ping() (time.Duration, *http.Response, string, error) {
 	duration, errIfce := timeIt(func() interface{} {
 		client := http.Client{
 			Timeout: ping.target.Timeout,
+			Transport: &http.Transport{
+				DisableKeepAlives: true, //每次GET都新建TCP/TLS
+			},
 		}
 
 		proxyProco := ping.target.Proxy

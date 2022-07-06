@@ -44,7 +44,8 @@ var rootCmd = cobra.Command{
   	> tcping -H google.com
   4. ping with URI schema
   	> tcping http://hui.lu
-	`,
+
+  homepage: https://github.com/qingyinge-em/tcping`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if showVersion {
 			fmt.Printf("version: %s\n", version)
