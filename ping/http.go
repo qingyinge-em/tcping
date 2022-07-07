@@ -3,6 +3,7 @@ package ping
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -121,6 +122,9 @@ func (ping HTTPing) ping() (time.Duration, *http.Response, string, error) {
 			Timeout: ping.target.Timeout,
 			Transport: &http.Transport{
 				DisableKeepAlives: true, //每次GET都新建TCP/TLS
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
 			},
 		}
 
